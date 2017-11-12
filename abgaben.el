@@ -170,6 +170,7 @@ and attachment number."
 		  (org-do-demote)
 		  (insert abgaben--curr-week)
 		  ))
+	  (end-of-line)
 	  (org-insert-heading nil t)
 	  (org-do-demote)
 	  (insert (concat "[[file:" (org-link-escape (f-join mu4e-attachment-dir  fname)) "][" fname "]]"))
