@@ -183,26 +183,6 @@ and attachment number."
 	  (insert (concat "[[file:" (org-link-escape (f-join mu4e-attachment-dir  fname)) "][" fname "]]"))
 	  (insert (concat " Email: [[mu4e:msgid:" msgid "][" subject "]]")))))
 
-
-(save-restriction
-  (org-narrow-to-subtree)
-  ;; search for current week's headline, if present
-  (let ((week-headl
-		 (org-element-map (org-element-parse-buffer) 'headline
-		   (lambda (x)
-			 (if (string-equal abgaben--curr-week (org-element-property :raw-value x))
-				 x
-			   nil))
-		   nil t)))
-	;; go to that headline or create new if not present
-	(if week-headl
-		(goto-char (org-element-property :begin week-headl))
-	  (org-insert-subheading nil)
-	  (insert abgaben--curr-week)
-	  )))
-
-
-
 (defun abgaben-get-file-at-heading ()
   "Get the path to the first file linked in this heading."
   (save-excursion
@@ -237,7 +217,7 @@ and attachment number."
 		;; already insert the subheading for the points, to be filled later
 		(org-insert-heading-respect-content)
 		(backward-char)
-		(insert (cons "* " abgaben-points-heading))
+		(insert (concat "* " abgaben-points-heading))
 		(save-excursion
 		  ;; org-set-property sometimes never returns if buffer not in org-mode
 		  ;; traverse all annotations that should be exported and export them
