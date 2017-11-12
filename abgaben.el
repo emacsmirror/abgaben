@@ -76,7 +76,7 @@
 ;;;###autoload
 (defgroup abgaben nil "A system for receiving and grading
 submissions for assignments using mu4e, org-mode and pdf-tools"
-  :group nil)
+  :group 'emacs)
 
 ;;;###autoload
 (defcustom abgaben-root-folder "/home/arne/lehre/2017-gwv/abgaben/"
@@ -149,7 +149,7 @@ and attachment number."
 	(make-directory mu4e-attachment-dir t)
 	(mu4e-view-save-attachment-single msg attnum)
 	(find-file abgaben-org-file)
-	(beginning-of-buffer)
+	(goto-char (point-min))
 	(org-link-search abgaben-heading)
 	(search-forward (concat "** " abgaben--curr-group))
 	(save-restriction
@@ -251,7 +251,7 @@ and attachment number."
 						 (cons (string-to-number (match-string 1 x))
 							   (string-to-number (match-string 2 x))))
 					   punkteliste)))
-		  (mapcar (lambda (x)
+		  (mapc (lambda (x)
 					(insert (concat x "\n")))
 				  punkteliste)
 		  (insert "Gesamt: ")
@@ -280,10 +280,10 @@ and attachment number."
 		(org-copy-subtree)
 		(with-temp-buffer
 		  (yank)
-		  (beginning-of-buffer)
+		  (goto-char (point-min))
 		  ;; delete heading for this
 		  (kill-whole-line)
-		  (end-of-buffer)
+		  (goto-char (point-max))
 		  (insert "<#part type=\"application/pdf\" filename=\"")
 		  (insert fname)
 		  (insert "\" disposition=attachment><#/part>")
@@ -301,7 +301,6 @@ saves the response in the kill ring for sending a reply"
 	(search-forward "Email:")
 	(search-forward "[[")
 	(org-open-at-point)
-	;(mu4e-compose-reply)
 	)
 )
 ;;; abgaben.el ends here
