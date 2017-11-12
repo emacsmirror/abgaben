@@ -165,10 +165,13 @@ and attachment number."
 		;; go to that headline or create new if not present
 		(if week-headl
 			(goto-char (org-element-property :begin week-headl))
-		  (org-insert-subheading nil)
+		  (end-of-line)
+		  (org-insert-heading nil t)
+		  (org-do-demote)
 		  (insert abgaben--curr-week)
 		  ))
-	  (org-insert-subheading nil)
+	  (org-insert-heading nil t)
+	  (org-do-demote)
 	  (insert (concat "[[file:" (org-link-escape (f-join mu4e-attachment-dir  fname)) "][" fname "]]"))
 	  (insert (concat " Email: [[mu4e:msgid:" msgid "][" subject "]]")))))
 
