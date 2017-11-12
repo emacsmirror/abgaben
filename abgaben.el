@@ -7,7 +7,7 @@
 ;; Keywords: mail outlines convenience
 ;; Homepage: http://arne.chark.eu/
 ;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0"))
-;; Package-Version: 1.0
+;; Package-Version: 1.0.1
 
 ;; This file is not part of GNU Emacs.
      
@@ -68,6 +68,7 @@
 (provide 'abgaben)
 (require 'pdf-annot)
 (require 'f)
+(require 'mu4e)
 
 (defconst abgaben-pdf-tools-org-non-exportable-types
   (list 'link)
@@ -79,14 +80,14 @@ submissions for assignments using mu4e, org-mode and pdf-tools"
   :group 'emacs)
 
 ;;;###autoload
-(defcustom abgaben-root-folder "/home/arne/lehre/2017-gwv/abgaben/"
+(defcustom abgaben-root-folder (expand-file-name "$HOME/abgaben/")
   "Directory in which submissions will be saved."
   :group 'abgaben
   :type '(string))
 
 ;;;###autoload
 (defcustom abgaben-org-file
-  "/home/arne/lehre/2017-gwv/abgaben/korrekturen.org"
+  (f-join abgaben-root-folder "abgaben.org")
   "File in which the links and notes are saved."
   :group 'abgaben
   :type '(string))
@@ -98,14 +99,14 @@ submissions for assignments using mu4e, org-mode and pdf-tools"
   :type '(string))
 
 ;;;###autoload
-(defcustom abgaben-points-re "Aufgabe [0-9.]*: ?\\([0-9.]*\\)/\\([0-9.]*\\)"
+(defcustom abgaben-points-re "assignment [0-9.]*: ?\\([0-9.]*\\)/\\([0-9.]*\\)"
   "Regular expression to match points in comments.
 Has two groups: first for points achieved, second for achievable points."
   :group 'abgaben
   :type '(regexp))
 
 ;;;###autoload
-(defcustom abgaben-all-groups '("montag" "mittwoch")
+(defcustom abgaben-all-groups '("group1" "group2")
   "Groups which you have, e.g. different days."
   :group 'abgaben
   :type '(repeat string))
@@ -117,10 +118,16 @@ Has two groups: first for points achieved, second for achievable points."
   :group 'abgaben
   :type '(repeat string))
 
-(defcustom abgaben-points-heading "Punkte"
+(defcustom abgaben-points-heading "your points"
   "Heading used for collected points."
   :group 'abgaben
   :type 'string)
+
+(defcustom abgaben-points-overall "overall"
+  "Prefix for accumulation of your points, i.e. 'Overall' in 'Overall: 50/100'."
+  :group 'abgaben
+  :type 'string)
+
 
 (defvar abgaben--curr-week (car abgaben-all-weeks))
 (defvar abgaben--curr-group (car abgaben-all-groups))
@@ -258,7 +265,7 @@ and attachment number."
 		  (mapc (lambda (x)
 					(insert (concat x "\n")))
 				  punkteliste)
-		  (insert "Gesamt: ")
+		  (insert (concat abgaben-points-overall ": "))
 		  (insert (number-to-string (apply '+ (mapcar 'car punkte))))
 		  (insert "/")
 		  (insert (number-to-string (apply '+ (mapcar 'cdr punkte))))
