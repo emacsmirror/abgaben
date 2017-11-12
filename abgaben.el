@@ -4,9 +4,9 @@
      
 ;; Author: Arne Köhn <arne@chark.eu>
 ;; Created: 31 Oct 2017
-;; Keywords: assignments correcting org-mode mu4e pdf-tools
+;; Keywords: mail outlines convenience
 ;; Homepage: http://arne.chark.eu/
-;; Package-Requires: ((pdf-tools) (f))
+;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0"))
 ;; Package-Version: 1.0
 
 ;; This file is not part of GNU Emacs.
@@ -36,7 +36,7 @@
 ;;
 ;; The basic worklfow is as follows:
 ;; You receive mails with assignments from your students
-;; You use an attachment action where (A g  if you used the example above) you
+;; You use an attachment action (A g  if you used the example above) where you
 ;;  - select the group this assignment belongs to
 ;;    e.g. you have several different courses or (as I usually have)
 ;;    two groups for your practical
@@ -69,13 +69,14 @@
 (require 'pdf-annot)
 (require 'f)
 
-(defconst pdf-tools-org-non-exportable-types
+(defconst abgaben-pdf-tools-org-non-exportable-types
   (list 'link)
   "Types of annotation that are not to be exported.")
 
 ;;;###autoload
 (defgroup abgaben nil "A system for receiving and grading
-submissions for assignments using mu4e, org-mode and pdf-tools")
+submissions for assignments using mu4e, org-mode and pdf-tools"
+  :group nil)
 
 ;;;###autoload
 (defcustom abgaben-root-folder "/home/arne/lehre/2017-gwv/abgaben/"
@@ -117,7 +118,7 @@ Has two groups: first for points achieved, second for achievable points."
   :type '(repeat string))
 
 (defcustom abgaben-points-heading "Punkte"
-  "Heading used for collected points"
+  "Heading used for collected points."
   :group 'abgaben
   :type 'string)
 
@@ -239,11 +240,11 @@ and attachment number."
 			   ;; quote or the text of a text annotation
 			   (insert (concat "\n" (pdf-annot-get annot 'contents)))))
 		   (cl-remove-if
-			(lambda (annot) (member (pdf-annot-get-type annot) pdf-tools-org-non-exportable-types))
+			(lambda (annot) (member (pdf-annot-get-type annot) abgaben-pdf-tools-org-non-exportable-types))
 			annots)))
 		;; Last: find all point annotations and insert them under the points subheading
 		(insert "\n")
-		(let* ((punkteliste (matches-in-buffer abgaben-points-re))
+		(let* ((punkteliste (abgaben-matches-in-buffer abgaben-points-re))
 			  (punkte (mapcar
 					   (lambda (x)
 						 (string-match abgaben-points-re x)
@@ -260,7 +261,7 @@ and attachment number."
 		  )))))
 
 
-(defun matches-in-buffer (regexp &optional buffer)
+(defun abgaben-matches-in-buffer (regexp &optional buffer)
   "Return a list of lines matching REGEXP in BUFFER or current buffer."
   (let ((matches))
     (save-match-data
