@@ -36,7 +36,7 @@ annotations exported as text and the annotated pdf as attachment.
 
 Press reply, yank, send, your are done!
 
-![send the email](http://arne.chark.eu/2017/11/13/abgaben/send-email-crop.webm)
+![send the email](http://arne.chark.eu/2017/11/13/abgaben/send-mail-crop.webm)
 
 
 There is also [a slightly longer explanation](http://arne.chark.eu/2017/11/13/abgaben/) at my blog.
