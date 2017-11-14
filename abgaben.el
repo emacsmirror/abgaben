@@ -6,8 +6,8 @@
 ;; Created: 31 Oct 2017
 ;; Keywords: mail outlines convenience
 ;; Homepage: http://arne.chark.eu/
-;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0"))
-;; Package-Version: 1.0.1
+;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0")) (s "1.12.0"))
+;; Package-Version: 1.1.0
 
 ;; This file is not part of GNU Emacs.
      
@@ -43,6 +43,8 @@
 ;;  - select the current week
 ;; It then saves that attachment to ABGABEN-ROOT-FOLDER/[group]/[week]/
 ;; and creates the directories as needed.
+;; the the assignment is a .zip or .tar.gz file, it will automatically be
+;; unpacked into a new directory.
 ;; After that, it produces a new heading in your ABGABEN-ORG-File
 ;; under ABGABEN-HEADING / [group] / [week]
 ;; containing a link to the saved attachment and the email.
@@ -68,6 +70,7 @@
 (provide 'abgaben)
 (require 'pdf-annot)
 (require 'f)
+(require 's)
 (require 'mu4e)
 
 (defconst abgaben-pdf-tools-org-non-exportable-types
@@ -180,8 +183,27 @@ and attachment number."
 	  (end-of-line)
 	  (org-insert-heading nil t)
 	  (org-do-demote)
-	  (insert (concat "[[file:" (org-link-escape (f-join mu4e-attachment-dir  fname)) "][" fname "]]"))
+	  (insert (concat "[[file:" (org-link-escape (f-join mu4e-attachment-dir  (abgaben--maybe-unzip mu4e-attachment-dir fname))) "][" fname "]]"))
 	  (insert (concat " Email: [[mu4e:msgid:" msgid "][" subject "]]")))))
+
+(defun abgaben--maybe-unzip (directory fname)
+  "Extract FNAME if it is an archive; return directory to link to."
+  (let ((default-directory directory))
+	(cond
+	 ;; extract zip files
+	 ((s-ends-with? ".zip" fname t)
+	  (let ((subdir (s-chop-suffix ".zip" fname)))
+		(call-process "mkdir" nil nil nil subdir)
+		(call-process "unzip" nil nil nil fname "-d" subdir)
+		subdir))
+	 ;; extract tar.gz files
+	 ((s-ends-with? ".tar.gz" fname t)
+	  (let ((subdir (s-chop-suffix ".tar.gz" fname)))
+		(call-process "mkdir" nil nil nil subdir)
+		(call-process "tar" nil nil nil "-xaf" fname "-C" subdir)
+		subdir))
+	 ;; not recognized; do nothing
+	 (fname))))
 
 (defun abgaben-get-file-at-heading ()
   "Get the path to the first file linked in this heading."
