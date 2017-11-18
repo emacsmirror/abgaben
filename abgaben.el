@@ -6,8 +6,8 @@
 ;; Created: 31 Oct 2017
 ;; Keywords: mail outlines convenience
 ;; Homepage: http://arne.chark.eu/
-;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0")) (s "1.12.0"))
-;; Package-Version: 1.1.0
+;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0") (s "1.11.0"))
+;; Package-Version: 1.1.1
 
 ;; This file is not part of GNU Emacs.
      
@@ -202,6 +202,12 @@ and attachment number."
 		(call-process "mkdir" nil nil nil subdir)
 		(call-process "tar" nil nil nil "-xaf" fname "-C" subdir)
 		subdir))
+	 ((s-ends-with? ".rar" fname t)
+	  (let ((subdir (s-chop-suffix ".rar" fname)))
+		(call-process "mkdir" nil nil nil subdir)
+		(call-process "unrar" nil nil nil "x" fname subdir)
+		subdir))
+
 	 ;; not recognized; do nothing
 	 (fname))))
 
