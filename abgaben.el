@@ -7,7 +7,7 @@
 ;; Keywords: mail outlines convenience
 ;; Homepage: http://arne.chark.eu/
 ;; Package-Requires: ((pdf-tools "0.80") (f "0.19.0") (s "1.11.0"))
-;; Package-Version: 1.1.1
+;; Package-Version: 1.1.2
 
 ;; This file is not part of GNU Emacs.
      
@@ -31,10 +31,10 @@
 ;;
 ;; You should add something like this to your configuration:
 ;; (add-to-list 'mu4e-view-attachment-actions
-;; '("gAbGabe speichern" . abgaben-save-abgabe) t)
+;; '("gAbGabe speichern" . abgaben-capture-submission) t)
 ;; and of course customize the variables of this package.
 ;;
-;; The basic worklfow is as follows:
+;; The basic workflow is as follows:
 ;; You receive mails with assignments from your students
 ;; You use an attachment action (A g  if you used the example above) where you
 ;;  - select the group this assignment belongs to
@@ -80,7 +80,7 @@
 ;;;###autoload
 (defgroup abgaben nil "A system for receiving and grading
 submissions for assignments using mu4e, org-mode and pdf-tools"
-  :group 'emacs)
+  :group 'applications)
 
 ;;;###autoload
 (defcustom abgaben-root-folder (expand-file-name "$HOME/abgaben/")
@@ -137,16 +137,16 @@ Has two groups: first for points achieved, second for achievable points."
 
 (defun abgaben--get-group ()
   "Prompt for a group and save the answer as new default."
-  (setq abgaben--curr-group (completing-read "Which group?" abgaben-all-groups nil t nil nil abgaben--curr-group))
+  (setq abgaben--curr-group (completing-read "Which group? " abgaben-all-groups nil t nil nil abgaben--curr-group))
   abgaben--curr-group)
 
 (defun abgaben--get-week ()
   "Prompt for a week and save the answer as new default."
-  (setq abgaben--curr-week (completing-read "Which week?" abgaben-all-weeks nil t nil nil abgaben--curr-week))
+  (setq abgaben--curr-week (completing-read "Which week? " abgaben-all-weeks nil t nil nil abgaben--curr-week))
   abgaben--curr-week)
 
 ;;;###autoload
-(defun abgaben-save-abgabe (msg attnum)
+(defun abgaben-capture-submission (msg attnum)
   "Add this to your mu4e attachment actions.
 Save an attachment from an e-mail and add information about this
 assignment to the org file.  MSG is and ATTNUM are the message
@@ -178,8 +178,7 @@ and attachment number."
 		  (end-of-line)
 		  (org-insert-heading nil t)
 		  (org-do-demote)
-		  (insert abgaben--curr-week)
-		  ))
+		  (insert abgaben--curr-week)))
 	  (end-of-line)
 	  (org-insert-heading nil t)
 	  (org-do-demote)
@@ -187,7 +186,7 @@ and attachment number."
 	  (insert (concat " Email: [[mu4e:msgid:" msgid "][" subject "]]")))))
 
 (defun abgaben--maybe-unzip (directory fname)
-  "Extract FNAME if it is an archive; return directory to link to."
+  "Extract FNAME in DIRECTORY if it is an archive; return directory/file to link to."
   (let ((default-directory directory))
 	(cond
 	 ;; extract zip files
@@ -291,7 +290,7 @@ and attachment number."
             (push (match-string 0) matches))))
       (reverse matches))))
 
-(defun abgaben--construct-abgabenbody ()
+(defun abgaben--construct-email-body ()
   "Build a reply text and copy it to kill ring."
   (save-restriction
 	(save-excursion
@@ -315,11 +314,9 @@ Opens Mail corresponding to submission and
 saves the response in the kill ring for sending a reply"
   (interactive)
   (save-excursion
-	(abgaben--construct-abgabenbody)
+	(abgaben--construct-email-body)
 	(beginning-of-line)
 	(search-forward "Email:")
 	(search-forward "[[")
-	(org-open-at-point)
-	)
-)
+	(org-open-at-point)))
 ;;; abgaben.el ends here
