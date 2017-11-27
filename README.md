@@ -39,4 +39,4 @@ Press reply, yank, send, your are done!
 ![send the email](http://arne.chark.eu/2017/11/13/abgaben/send-mail-crop.webm)
 
 
-There is also [a slightly longer explanation](http://arne.chark.eu/2017/11/13/abgaben/) at my blog.
+There is also [a slightly longer explanation](http://arne.chark.eu/2017/abgaben-el-assignment-correction-with-emacs/) at my blog.
